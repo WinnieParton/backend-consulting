@@ -1,6 +1,5 @@
 package esgi.infra.controller;
 
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -10,9 +9,8 @@ import org.springframework.web.bind.annotation.RestController;
 public class PersonController {
 
     @GetMapping
-    public ResponseEntity<?> home() {
-
-        return ResponseEntity.ok("Welcome successs");
+    public String home() {
+        return "Welcome successs";
     }
 
 }

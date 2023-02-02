@@ -24,5 +24,4 @@ public class BackendConsultingApplication implements CommandLineRunner {
 		roleServices.CreateRole();
 	}
 
-
 }
