@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import esgi.infra.service.RoleServices;
 
-@CrossOrigin(origins = "*", maxAge = 3600)
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
 @RequestMapping("/role")
 public class RoleController {

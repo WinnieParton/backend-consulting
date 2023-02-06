@@ -35,7 +35,7 @@ import esgi.infra.repository.PersonRepository;
 import esgi.infra.repository.RoleRepository;
 import esgi.infra.service.impl.UserDetailsImpl;
 
-@CrossOrigin(origins = "*", maxAge = 3600)
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
