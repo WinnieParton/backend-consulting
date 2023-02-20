@@ -1,8 +1,6 @@
 
 package esgi.infra.service.impl;
 
-import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -21,15 +19,9 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     @Override
     @Transactional
     public UserDetails loadUserByUsername(String username) throws RuntimeException {
+        Person user = personRepository.findByEmail(username)
+                .orElseThrow(() -> new RuntimeException("Person Not Found with email: " + username));
 
-        Optional<Person> user = personRepository.findByEmail(username);
-
-        System.out.println("username00000000000  ");
-        System.out.print(user);
-        
-        if (user.isPresent())
-            return UserDetailsImpl.build(user.get());
-        else
-            throw new RuntimeException("Person Not Found with email: " + username);
+        return UserDetailsImpl.build(user);
     }
 }
