@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  DOCKER_USERNAME: winniemonel
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    services:
+      docker:
+        image: docker:dind
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Build with Maven
+        uses: mvndaemon/maven-action@v3
+        with:
+          args: package -B
+        continue-on-error: true
+        id: build
+      - name: Archive artifacts
+        uses: actions/upload-artifact@v2
+        with:
+          name: jar
+          path: target/*.jar
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
+          tags: winniemonel/backend:${{ github.sha }}
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+        if: steps.build.outcome == 'success'
