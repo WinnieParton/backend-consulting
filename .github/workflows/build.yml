@@ -17,10 +17,12 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
-      - name: Build with Maven
-        uses: mvndaemon/maven-action@v3
+      - name: Set up Java
+        uses: actions/setup-java@v1
         with:
-          args: package -B
+          java-version: '11'
+      - name: Build with Maven
+        run: mvn package -B
         continue-on-error: true
         id: build
       - name: Archive artifacts
