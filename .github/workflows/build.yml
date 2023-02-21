@@ -16,6 +16,18 @@ jobs:
     services:
       docker:
         image: docker:dind
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_USER: ${{ variables.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ variables.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ variables.POSTGRES_DB }}
+          POSTGRES_HOST: ${{ variables.POSTGRES_HOST }}
+          SPRING_JPA_HIBERNATE_DDL_AUTO: ${{ variables.SPRING_JPA_HIBERNATE_DDL_AUTO }}
+        ports:
+        - 5432:5432
+        # needed because the postgres container does not provide a healthcheck
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
