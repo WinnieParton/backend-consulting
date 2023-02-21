@@ -4,6 +4,8 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    types: [opened, synchronize, reopened]
 
 env:
   DOCKER_USERNAME: winniemonel
@@ -30,16 +32,6 @@ jobs:
         with:
           name: jar
           path: target/*.jar
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          push: true
-          tags: winniemonel/backend:${{ github.sha }}
-        env:
-          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-        if: steps.build.outcome == 'success'
       - name: Login to Docker Hub
         uses: docker/login-action@v1
         with:
@@ -47,7 +39,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
       - name: Build Docker image
         run: |
-          docker build -t winniemonel/backend:${{ github.sha }} .
+          docker build -t $DOCKER_USERNAME/backend:${{ github.sha }} .
         env:
           DOCKER_USERNAME: ${{ env.DOCKER_USERNAME }}
       - name: Push Docker image
@@ -55,7 +47,24 @@ jobs:
         with:
           context: .
           push: true
-          tags: winniemonel/backend:${{ github.sha }}
+          tags: $DOCKER_USERNAME/backend:${{ github.sha }}
         env:
           DOCKER_USERNAME: ${{ env.DOCKER_USERNAME }}
         if: success()
+      - name: Cache SonarCloud packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+      - name: Cache Maven packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+      - name: Build and analyze
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        run: mvn -B verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.projectKey=WinnieParton_backend-consulting
